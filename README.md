@@ -41,6 +41,12 @@ Full TC: [Roulette_Testsuit](https://docs.google.com/spreadsheets/d/e/2PACX-1vQh
 | **확률/가챠 (Mode C)** | - 소수점 둘째 자리(n.nn%) 초과 입력 시 정규식 마스킹 방어 검증<br>- 0% 확률 입력 시 동적 렌더링 및 당첨 풀(Pool) 제외 확인<br>- 확률 총합 부동소수점 오차(99.99%, 100.01%) 시 스핀 방어 검증 |
 | **데이터 무결성** | - 현재 룰렛 상태(메뉴명, 커스텀 확률) 프리셋 저장 및 동적 덮어쓰기 분기 처리 검증<br>- 데이터 임의 훼손 후 프리셋 불러오기를 통한 UI/데이터 완벽 복구 검증 |
 
+
+## Demo (시연 영상)
+[![Watch the demo](https://img.youtube.com/vi/TJylaLFEBDg/mqdefault.jpg)]([https://example.com/video](https://www.youtube.com/watch?v=TJylaLFEBDg))
+
+썸네일을 클릭하여 YouTube에서 데모를 시청합니다.
+
 ## Troubleshooting (주요 트러블슈팅)
 
 **1. 선언형 UI(Compose / SwiftUI) 접근성 트리 동기화(State Sync) 이슈 해결**
