@@ -71,7 +71,7 @@ Full TC: [Roulette_Testsuit](https://docs.google.com/spreadsheets/d/e/2PACX-1vQh
 
 **6. 속성(Attribute) 파편화에 대응하는 하이브리드 XPath 설계**
 - **문제:** 결과 팝업 등에서 OS(AOS/iOS)와 프레임워크 구현 방식에 따라 텍스트가 `@text`, `@label`, `@name` 등 서로 다른 속성에 파편화되어 담기는 문제.
-- **해결 방안:** `//*[contains(@text, '결과') or contains(@label, '결과') or contains(@name, '결과')]` 와 같이 `or` 조건으로 묶은 강력한 하이브리드 XPath 수사망을 구축. 단 한 줄의 쿼리로 OS나 개발 구현 방식의 변경에 구애받지 않고 견고하게 텍스트를 추출해 내는 유지보수성 확보.
+- **해결 방안:** `//*[contains(@text, '결과') or contains(@label, '결과') or contains(@name, '결과')]` 와 같이 `or` 조건으로 묶은 하이브리드 XPath 검색 구축. 단 한 줄의 쿼리로 OS나 개발 구현 방식의 변경에 구애받지 않고 견고하게 텍스트를 추출해 내는 유지보수성 확보.
 
 ## Test Optimization Strategy (테스트 최적화 전략)
 - **Appium Lifecycle 제어:** `conftest.py`에서 `no_reset = True` 옵션으로 무거운 드라이버 세션 생성은 테스트 전체에서 딱 1번만 수행하고, 각 단위 테스트(`scope="function"`)가 시작될 때마다 `terminate_app` / `activate_app`을 호출하여 1~2초 만에 앱을 초기(Clean) 상태로 되돌리도록 극도로 최적화했습니다.
