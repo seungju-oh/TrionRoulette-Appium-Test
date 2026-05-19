@@ -43,7 +43,7 @@ Full TC: [Roulette_Testsuit](https://docs.google.com/spreadsheets/d/e/2PACX-1vQh
 
 
 ## Demo (시연 영상)
-[![Watch the demo](https://img.youtube.com/vi/TJylaLFEBDg/mqdefault.jpg)]([https://example.com/video](https://www.youtube.com/watch?v=TJylaLFEBDg))
+[![Watch the demo](https://img.youtube.com/vi/TJylaLFEBDg/mqdefault.jpg)]([https://www.youtube.com/watch?v=TJylaLFEBDg])
 
 썸네일을 클릭하여 YouTube에서 데모를 시청합니다.
 
