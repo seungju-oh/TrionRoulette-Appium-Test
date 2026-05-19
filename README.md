@@ -1,4 +1,4 @@
-# AI Assisted AOS/iOS Roulette App - QA UI Automation Test Portfolio
+# AI-Assisted AOS/iOS Roulette App - QA UI Automation Test Portfolio
 
 AI를 활용하여 직접 개발한 AOS(Jetpack Compose) / iOS(SwiftUI) 룰렛 앱을 대상으로 한 **Appium 크로스플랫폼 UI 자동화 테스트 프로젝트**입니다. 
 하나의 테스트 스크립트로 두 운영체제(Android/iOS)의 핵심 기능과 예외 상황(Edge Cases)을 동시에 검증할 수 있도록 설계하였으며, 유지보수성과 확장성을 극대화하기 위해 **POM (Page Object Model)** 디자인 패턴을 적용했습니다.
