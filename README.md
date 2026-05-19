@@ -39,7 +39,7 @@ Full TC: [Roulette_Testsuit](https://docs.google.com/spreadsheets/d/e/2PACX-1vQh
 | **공통 (Mode A)** | - 최소 항목(2개) 미만 삭제 시 방어 로직 작동 확인<br>- 빈 텍스트("") 입력 시 스핀 버튼 비활성화 검증<br>- 스핀 버튼 중복 클릭(따닥) 방어 검증 |
 | **서바이벌 (Mode B)** | - 룰렛 결과에 따른 당첨 항목 비활성화(Dim) 및 재스핀 제외 검증<br>- 모든 항목 당첨 완료 후 상태 자동 초기화 및 무결성 검증 |
 | **확률/가챠 (Mode C)** | - 소수점 둘째 자리(n.nn%) 초과 입력 시 정규식 마스킹 방어 검증<br>- 0% 확률 입력 시 동적 렌더링 및 당첨 풀(Pool) 제외 확인<br>- 확률 총합 부동소수점 오차(99.99%, 100.01%) 시 스핀 방어 검증 |
-| **데이터 무결성** | - 현재 룰렛 상태(메뉴명, 커스텀 확률) 프리셋 저장 및 동적 덮어쓰기 분기 처리 검증<br>- 데이터 임의 훼손 후 프리셋 불러오기를 통한 UI/데이터 완벽 복구 검증 |
+| **데이터 무결성 및 상태 복구** | - 현재 룰렛 상태(메뉴명, 커스텀 확률) 프리셋 저장 및 동적 덮어쓰기 경고 팝업 처리(Dynamic Wait) 검증<br>- **화면 오염(Data Pollution) 기법** 적용: 저장 직후 모드 변경 및 악의적인 쓰레기 데이터를 주입하여 UI를 완전히 훼손한 뒤, 프리셋 불러오기를 수행하여 원래 데이터가 1bit의 유실 없이 100% 원상 복구되는지 3중 교차 검증 (개수, 텍스트, 확률). |
 
 
 ## Demo (시연 영상)
@@ -60,6 +60,22 @@ Full TC: [Roulette_Testsuit](https://docs.google.com/spreadsheets/d/e/2PACX-1vQh
 **3. 단일 식별자(Single Locator) 전략 수립**
 - **문제:** 안드로이드와 iOS의 UI 요소 접근 방식이 달라 유지보수 포인트가 2배로 늘어나는 문제.
 - **해결 방안:** 개발 단계에서부터 Android의 `Modifier.semantics { contentDescription = "ID" }`와 iOS의 `.accessibilityIdentifier("ID")`를 1:1로 완벽히 동일하게 부여. 이를 통해 Appium Page Object에서 `By.ACCESSIBILITY_ID` 하나만으로 두 플랫폼의 UI 요소를 동시에 찾을 수 있는 크로스플랫폼 자동화 달성.
+
+**4. iOS 팝업 중복 DOM(Shadow Element) 및 터치 영역(Hitbox) 버그 해결**
+- **문제:** iOS에서 프리셋 저장/불러오기 팝업이 뜰 때, 배경에 가려진 동일한 이름의 기존 버튼이 DOM에 남아있어 `find_element` 시 엉뚱한 곳을 클릭하거나, 버튼 크기에 비해 실제 터치 판정 영역이 좁아 `.click()`이 무시되는 현상 발생.
+- **해결 방안:** 요소들을 `find_elements`로 모두 찾은 뒤 파이썬 리스트의 맨 마지막 요소(`[-1]`)를 선택하여 항상 최상단 팝업의 버튼을 누르도록 해결. 또한, 터치 무시 버그는 `execute_script("mobile: tap", {"x": 5, "y": 5})`를 사용해 버튼의 좌측 상단을 핀포인트로 물리 타격하는 우회(Workaround) 기법을 적용.
+
+**5. AOS Jetpack Compose 텍스트 추출 한계 극복 (XML 투망 검증)**
+- **문제:** Android 환경에서 비정상적인 값(소수점 3자리 등)을 고속 타자 입력 시, UI 요소 내부의 텍스트를 `el.text`로 정밀하게 추출하려 하면 캐시(Cache)된 이전 데이터를 읽어오거나 렌더링 지연으로 빈 값을 반환하는 문제.
+- **해결 방안:** 특정 요소에 얽매이지 않고, Appium의 `driver.page_source`를 활용해 현재 화면에 그려진 전체 XML 구조를 문자열로 추출. 이를 통해 화면 어딘가에 비정상 데이터가 단 한 글자라도 노출(Leak)되었는지 이중 검증(`not in` 과 `in` 결합)하는 '데이터 무결성 투망 스캔' 로직을 구축.
+
+**6. 속성(Attribute) 파편화에 대응하는 하이브리드 XPath 설계**
+- **문제:** 결과 팝업 등에서 OS(AOS/iOS)와 프레임워크 구현 방식에 따라 텍스트가 `@text`, `@label`, `@name` 등 서로 다른 속성에 파편화되어 담기는 문제.
+- **해결 방안:** `//*[contains(@text, '결과') or contains(@label, '결과') or contains(@name, '결과')]` 와 같이 `or` 조건으로 묶은 강력한 하이브리드 XPath 수사망을 구축. 단 한 줄의 쿼리로 OS나 개발 구현 방식의 변경에 구애받지 않고 견고하게 텍스트를 추출해 내는 유지보수성 확보.
+
+## Test Optimization Strategy (테스트 최적화 전략)
+- **Appium Lifecycle 제어:** `conftest.py`에서 `no_reset = True` 옵션으로 무거운 드라이버 세션 생성은 테스트 전체에서 딱 1번만 수행하고, 각 단위 테스트(`scope="function"`)가 시작될 때마다 `terminate_app` / `activate_app`을 호출하여 1~2초 만에 앱을 초기(Clean) 상태로 되돌리도록 극도로 최적화했습니다.
+- **동적 대기(Dynamic Wait):** 불안정한 `time.sleep()` 사용을 최소화하고, `WebDriverWait`과 예외 처리(`TimeoutException`)를 결합하여 안 뜰지도 모르는 팝업(덮어쓰기 경고 등)을 단 1.5초 만에 판별하고 넘어가는 척후병 로직을 구현해 전체 테스트 소요 시간을 대폭 단축했습니다.
 
 ## How to Run
 
