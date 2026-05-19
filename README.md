@@ -57,7 +57,7 @@ Full TC: [Roulette_Testsuit](https://docs.google.com/spreadsheets/d/e/2PACX-1vQh
 - **문제:** Appium의 `.clear()` 함수가 Compose의 `OutlinedTextField`나 iOS `TextField`에서 에러 없이 무시되는 현상 발생.
 - **해결 방안:** Android의 경우 키보드 커서를 강제로 맨 뒤로 이동(`KEYCODE_MOVE_END`)시킨 후, 물리적인 백스페이스(`KEYCODE_DEL`) 이벤트를 반복 전송하고, iOS의 경우 문자열 길이만큼 `\b` (백스페이스)를 전송하도록 Page Object 내에 **OS 분기형 물리적 텍스트 삭제 로직**을 구현하여 완벽한 데이터 초기화 성공.
 
-**3. 단일 식별자(Single Locator) 전략 수립
+**3. 단일 식별자(Single Locator) 전략 수립**
 - **문제:** 안드로이드와 iOS의 UI 요소 접근 방식이 달라 유지보수 포인트가 2배로 늘어나는 문제.
 - **해결 방안:** 개발 단계에서부터 Android의 `Modifier.semantics { contentDescription = "ID" }`와 iOS의 `.accessibilityIdentifier("ID")`를 1:1로 완벽히 동일하게 부여. 이를 통해 Appium Page Object에서 `By.ACCESSIBILITY_ID` 하나만으로 두 플랫폼의 UI 요소를 동시에 찾을 수 있는 크로스플랫폼 자동화 달성.
 
